@@ -14,6 +14,10 @@ public class Ebook {
         return id;
     }
 
+    public Ebook() {
+
+    }
+
     public Ebook(String id, String author, String title, String format) {
         this.id = id;
         this.author = author;
