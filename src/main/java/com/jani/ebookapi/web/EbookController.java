@@ -49,4 +49,10 @@ public class EbookController {
         return existingEbook;
     }
 
+    @DeleteMapping("/ebooks/{ebook_id}")
+    public void deleteBook(@PathVariable String ebook_id) {
+        Ebook ebook = booksData.remove(ebook_id);
+        if (ebook == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    }
+
 }
