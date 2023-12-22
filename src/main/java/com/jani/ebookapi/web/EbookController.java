@@ -11,7 +11,7 @@ import java.util.*;
 public class EbookController {
 
     private Map<String, Ebook> booksData = new HashMap<>() {{
-        put("1", new Ebook("1", "test", "test", "test"));
+        //put("1", new Ebook("1", "test", "test", "test"));
     }};
     //private List<Ebook> books = List.of(new Ebook("1", "test", "test", "test"));
 
@@ -25,10 +25,10 @@ public class EbookController {
         return booksData.values();
     }
 
-    @GetMapping("/ebooks/{id}")
-    public Ebook getEbook(@PathVariable String id) {
-        Ebook ebook = booksData.get(id);
-        if (ebook == null) throw new ResponseStatusException((HttpStatus.NOT_FOUND));
+    @GetMapping("/ebooks/{ebook_id}")
+    public Ebook getEbook(@PathVariable String ebook_id) {
+        Ebook ebook = booksData.get(ebook_id);
+        if (ebook == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         return ebook;
     }
 
@@ -37,6 +37,16 @@ public class EbookController {
         ebook.setId(UUID.randomUUID().toString());
         booksData.put(ebook.getId(), ebook);
         return ebook;
+    }
+
+    @PutMapping("/ebooks/{ebook_id}")
+    public Ebook updateEbook(@RequestBody Ebook ebook, @PathVariable String ebook_id) {
+        Ebook existingEbook = booksData.get(ebook_id);
+        if (existingEbook == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        if (ebook.getAuthor() != null) existingEbook.setAuthor(ebook.getAuthor());
+        if (ebook.getFormat() != null) existingEbook.setFormat(ebook.getFormat());
+        if (ebook.getTitle() != null) existingEbook.setTitle(ebook.getTitle());
+        return existingEbook;
     }
 
 }
