@@ -1,8 +1,9 @@
 package com.jani.ebookapi.model;
 
-
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotEmpty;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Ebook {
 
     private String id;
