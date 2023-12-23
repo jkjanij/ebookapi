@@ -40,13 +40,11 @@ public class EbookController {
     }
 
     @PutMapping("/ebooks/{ebook_id}")
-    public Ebook updateEbook(@RequestBody Ebook ebook, @PathVariable String ebook_id) {
+    public Ebook updateEbook(@RequestBody Ebook updatedEbook, @PathVariable String ebook_id) {
         Ebook existingEbook = booksData.get(ebook_id);
         if (existingEbook == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        if (ebook.getAuthor() != null) existingEbook.setAuthor(ebook.getAuthor());
-        if (ebook.getFormat() != null) existingEbook.setFormat(ebook.getFormat());
-        if (ebook.getTitle() != null) existingEbook.setTitle(ebook.getTitle());
-        return existingEbook;
+        booksData.replace(ebook_id, existingEbook, updatedEbook);
+        return updatedEbook;
     }
 
     @DeleteMapping("/ebooks/{ebook_id}")
