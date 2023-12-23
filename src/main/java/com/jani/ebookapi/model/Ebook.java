@@ -1,18 +1,20 @@
 package com.jani.ebookapi.model;
 
+
+import jakarta.validation.constraints.NotEmpty;
+
 public class Ebook {
 
     private String id;
 
+    @NotEmpty
     private String author;
 
+    @NotEmpty
     private String title;
 
+    @NotEmpty
     private String format;
-
-    public String getId() {
-        return id;
-    }
 
     public Ebook() {
 
@@ -23,6 +25,10 @@ public class Ebook {
         this.author = author;
         this.title = title;
         this.format = format;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public void setId(String id) {
