@@ -1,6 +1,7 @@
 package com.jani.ebookapi.web;
 
 import com.jani.ebookapi.model.Ebook;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -11,9 +12,7 @@ import java.util.*;
 public class EbookController {
 
     private Map<String, Ebook> booksData = new HashMap<>() {{
-        //put("1", new Ebook("1", "test", "test", "test"));
     }};
-    //private List<Ebook> books = List.of(new Ebook("1", "test", "test", "test"));
 
     @GetMapping("/")
     public String welcomeToAPI() {
@@ -33,16 +32,17 @@ public class EbookController {
     }
 
     @PostMapping("/ebooks")
-    public Ebook addEbook(@RequestBody Ebook ebook) {
+    public Ebook addEbook(@RequestBody @Valid Ebook ebook) {
         ebook.setId(UUID.randomUUID().toString());
         booksData.put(ebook.getId(), ebook);
         return ebook;
     }
 
     @PutMapping("/ebooks/{ebook_id}")
-    public Ebook updateEbook(@RequestBody Ebook updatedEbook, @PathVariable String ebook_id) {
+    public Ebook updateEbook(@RequestBody @Valid Ebook updatedEbook, @PathVariable String ebook_id) {
         Ebook existingEbook = booksData.get(ebook_id);
         if (existingEbook == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        updatedEbook.setId(ebook_id);
         booksData.replace(ebook_id, existingEbook, updatedEbook);
         return updatedEbook;
     }
