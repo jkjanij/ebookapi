@@ -3,6 +3,7 @@ package com.jani.ebookapi.web;
 import com.jani.ebookapi.model.Ebook;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -20,15 +21,20 @@ public class EbookController {
     }
 
     @GetMapping("/ebooks")
-    public Collection<Ebook> getEbook() {
-        return booksData.values();
+    public ResponseEntity<Object> getEbook() {
+        Collection<Ebook> ebooks = booksData.values();
+        return ResponseEntity.ok().body(Map.of("data", ebooks));
     }
 
     @GetMapping("/ebooks/{ebook_id}")
     public Ebook getEbook(@PathVariable String ebook_id) {
         Ebook ebook = booksData.get(ebook_id);
         if (ebook == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        return ebook;
+        Ebook returnEbook = new Ebook();
+        returnEbook.setFormat(ebook.getFormat());
+        returnEbook.setTitle(ebook.getTitle());
+        returnEbook.setAuthor(ebook.getAuthor());
+        return returnEbook;
     }
 
     @PostMapping("/ebooks")
@@ -44,7 +50,11 @@ public class EbookController {
         if (existingEbook == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         updatedEbook.setId(ebook_id);
         booksData.replace(ebook_id, existingEbook, updatedEbook);
-        return updatedEbook;
+        Ebook returnEbook = new Ebook();
+        returnEbook.setFormat(updatedEbook.getFormat());
+        returnEbook.setTitle(updatedEbook.getTitle());
+        returnEbook.setAuthor(updatedEbook.getAuthor());
+        return returnEbook;
     }
 
     @DeleteMapping("/ebooks/{ebook_id}")
