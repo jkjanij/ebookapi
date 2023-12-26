@@ -27,14 +27,15 @@ public class EbookController {
     @GetMapping("/ebooks")
     public ResponseEntity<Object> getEbook() {
         Collection<Ebook> ebooks = ebookService.getAll();
-        return ResponseEntity.ok().body(Map.of("data", ebooks));
+        // format return data
+        return new ResponseEntity<>(Map.of("data", ebooks), HttpStatus.OK);
     }
 
     @GetMapping("/ebooks/{ebook_id}")
     public Ebook getEbook(@PathVariable String ebook_id) {
         Ebook ebook = ebookService.get(ebook_id);
         if (ebook == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        // discard id
+        // create new Ebook with null id to discard id
         Ebook returnEbook = new Ebook();
         returnEbook.setFormat(ebook.getFormat());
         returnEbook.setTitle(ebook.getTitle());
@@ -43,8 +44,8 @@ public class EbookController {
     }
 
     @PostMapping("/ebooks")
-    public Ebook addEbook(@RequestBody @Valid Ebook ebook) {
-        return ebookService.add(ebook);
+    public ResponseEntity<Ebook> addEbook(@RequestBody @Valid Ebook ebook) {
+        return new ResponseEntity<>(ebookService.add(ebook), HttpStatus.CREATED);
     }
 
     @PutMapping("/ebooks/{ebook_id}")
@@ -53,7 +54,7 @@ public class EbookController {
         if (existingEbook == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         updatedEbook.setId(ebook_id);
         ebookService.update(ebook_id, existingEbook, updatedEbook);
-        // discard id
+        // create new Ebook with null id to discard id
         Ebook returnEbook = new Ebook();
         returnEbook.setFormat(updatedEbook.getFormat());
         returnEbook.setTitle(updatedEbook.getTitle());
