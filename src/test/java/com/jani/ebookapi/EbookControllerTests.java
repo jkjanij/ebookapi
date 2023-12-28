@@ -12,12 +12,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.UUID;
+import java.util.*;
 
+import static net.bytebuddy.matcher.ElementMatchers.is;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.StringRegularExpression.matchesRegex;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -63,13 +65,15 @@ class EbookControllerTests {
             return outputEbook;
         });
 
-        // Act and Assert
+        // Act
         ResultActions response = this.mockMvc.perform(post("/ebooks")
                         .content(objectMapper.writeValueAsString(inputEbook))
                         .contentType(MediaType.APPLICATION_JSON));
 
+        // Assert
         response.andExpect(MockMvcResultMatchers.status().isCreated())
-                        .andDo(MockMvcResultHandlers.print())
+                        //.andDo(MockMvcResultHandlers.print())
+                        .andExpect(header().string("Content-Type", "application/json"))
                         .andExpect(jsonPath("$.author").value("testAuthor"))
                         .andExpect(jsonPath("$.title").value("testTitle"))
                         .andExpect(jsonPath("$.format").value("testFormat"))
@@ -80,12 +84,45 @@ class EbookControllerTests {
     @Test
     void getEbookWithNoStoredEbooks() throws Exception {
 
-        // Act and Assert
+        // Arrange
+        Map<String, Ebook> noEbooks = new HashMap<>();
+        when(ebookService.getAll()).thenReturn(noEbooks.values());
+
+        // Act
         ResultActions response = this.mockMvc.perform(get("/ebooks")
                         .contentType(MediaType.APPLICATION_JSON));
 
-        response.andDo(print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
+        // Assert
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                //.andDo(print())
+                .andExpect(header().string("Content-Type", "application/json"))
                 .andExpect(jsonPath( "$.data", Matchers.empty()));
+    }
+
+    @Test
+    void getEbookWithStoredEbooks() throws Exception {
+
+        // Arrange
+        Map<String, Ebook> oneEbook = new HashMap<>()
+                {{
+                    String id = UUID.randomUUID().toString();
+                    put(id, new Ebook(id, "testAuthor", "testTitle", "testFormat"));
+                }};
+        when(ebookService.getAll()).thenReturn(oneEbook.values());
+
+        // Act
+        ResultActions response = this.mockMvc.perform(get("/ebooks")
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // Assert
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                //.andDo(print())
+                .andExpect(header().string("Content-Type", "application/json"))
+                .andExpect(jsonPath("$.data", hasSize(1)))
+                .andExpect(jsonPath("$.data[0].id").exists())
+                //.andExpect(jsonPath("$.data[0].id", isValidUUID())) // need some method to check for valid UUID
+                .andExpect(jsonPath("$.data[0].author").value("testAuthor"))
+                .andExpect(jsonPath("$.data[0].title").value("testTitle"))
+                .andExpect(jsonPath("$.data[0].format").value("testFormat"));
     }
 }
