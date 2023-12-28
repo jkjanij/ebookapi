@@ -47,7 +47,7 @@ class EbookControllerTests {
     void shouldReturnHello() throws Exception {
 
         this.mockMvc.perform(get("/"))
-                .andDo(print())
+                //.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Welcome!")));
     }
@@ -80,7 +80,8 @@ class EbookControllerTests {
                         .andExpect(jsonPath("$.title").value("testTitle"))
                         .andExpect(jsonPath("$.format").value("testFormat"))
                         .andExpect(jsonPath("$.id").exists())
-                        .andExpect(jsonPath("$.id").isString());
+                        .andExpect(jsonPath("$.id").isString())
+                        .andExpect(jsonPath("$.*", hasSize(4)));
     }
 
     @ParameterizedTest
@@ -103,7 +104,8 @@ class EbookControllerTests {
 
         // Assert
         verifyNoInteractions(ebookService);
-        response.andExpect(MockMvcResultMatchers.status().isBadRequest());
+        response.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(content().string(""));
                 //.andDo(print());
     }
 
@@ -122,7 +124,8 @@ class EbookControllerTests {
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 //.andDo(print())
                 .andExpect(header().string("Content-Type", "application/json"))
-                .andExpect(jsonPath( "$.data", Matchers.empty()));
+                .andExpect(jsonPath( "$.data", Matchers.empty()))
+                .andExpect(jsonPath("$.*", hasSize(1)));
     }
 
     @Test
@@ -149,6 +152,49 @@ class EbookControllerTests {
                 //.andExpect(jsonPath("$.data[0].id", isValidUUID())) // need some method to check for valid UUID
                 .andExpect(jsonPath("$.data[0].author").value("testAuthor"))
                 .andExpect(jsonPath("$.data[0].title").value("testTitle"))
-                .andExpect(jsonPath("$.data[0].format").value("testFormat"));
+                .andExpect(jsonPath("$.data[0].format").value("testFormat"))
+                .andExpect(jsonPath("$.data[0].*", hasSize(4)));
+    }
+
+    @Test
+    void getEbookByIdWithMatch() throws Exception {
+
+        // Arrange
+        String id = UUID.randomUUID().toString();
+        Ebook returnEbook = new Ebook();
+        returnEbook.setFormat("testFormat");
+        returnEbook.setTitle("testTitle");
+        returnEbook.setAuthor("testAuthor");
+        when(ebookService.get(id)).thenReturn(returnEbook);
+
+        // Act
+        ResultActions response = this.mockMvc.perform(get("/ebooks/"+id)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // Assert
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                //.andDo(print())
+                .andExpect(header().string("Content-Type", "application/json"))
+                .andExpect(jsonPath("$.author").value("testAuthor"))
+                .andExpect(jsonPath("$.title").value("testTitle"))
+                .andExpect(jsonPath("$.format").value("testFormat"))
+                .andExpect(jsonPath("$.*", hasSize(3)));
+    }
+
+    @Test
+    void getEbookByIdWithoutMatch() throws Exception {
+
+        // Arrange
+        String id = UUID.randomUUID().toString();
+        when(ebookService.get(id)).thenReturn(null);
+
+        // Act
+        ResultActions response = this.mockMvc.perform(get("/ebooks/"+id)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // Assert
+        response.andExpect(MockMvcResultMatchers.status().isNotFound())
+                //.andDo(print())
+                .andExpect(content().string(""));
     }
 }
