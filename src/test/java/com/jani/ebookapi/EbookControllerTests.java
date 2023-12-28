@@ -22,10 +22,8 @@ import java.util.*;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -110,7 +108,7 @@ class EbookControllerTests {
     }
 
     @Test
-    void getEbooksWithNoStoredEbooks() throws Exception {
+    void getAllEbooksWithNoStoredEbooks() throws Exception {
 
         // Arrange
         Map<String, Ebook> noEbooks = new HashMap<>();
@@ -129,12 +127,12 @@ class EbookControllerTests {
     }
 
     @Test
-    void getEbooksWithStoredEbook() throws Exception {
+    void getAllEbooksWithStoredEbook() throws Exception {
 
         // Arrange
+        String id = UUID.randomUUID().toString();
         Map<String, Ebook> oneEbook = new HashMap<>()
                 {{
-                    String id = UUID.randomUUID().toString();
                     put(id, new Ebook(id, "testAuthor", "testTitle", "testFormat"));
                 }};
         when(ebookService.getAll()).thenReturn(oneEbook.values());
@@ -157,7 +155,7 @@ class EbookControllerTests {
     }
 
     @Test
-    void getEbookByIdWithMatch() throws Exception {
+    void getEbookByIdWithIdMatch() throws Exception {
 
         // Arrange
         String id = UUID.randomUUID().toString();
@@ -182,7 +180,7 @@ class EbookControllerTests {
     }
 
     @Test
-    void getEbookByIdWithoutMatch() throws Exception {
+    void getEbookByIdWithoutIdMatch() throws Exception {
 
         // Arrange
         String id = UUID.randomUUID().toString();
@@ -195,6 +193,122 @@ class EbookControllerTests {
         // Assert
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
                 //.andDo(print())
+                .andExpect(content().string(""));
+    }
+
+    @Test
+    void updateEbookByIdWithoutIdMatchWithProperPayload() throws Exception {
+
+        // Arrange
+        String id = UUID.randomUUID().toString();
+        Ebook update = new Ebook();
+        update.setFormat("testFormat");
+        update.setTitle("testTitle");
+        update.setAuthor("testAuthor");
+        when(ebookService.get(id)).thenReturn(null);
+
+        // Act
+        ResultActions response = this.mockMvc.perform(put("/ebooks/"+id)
+                .content(objectMapper.writeValueAsString(update))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // Assert
+        response.andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andDo(print())
+                .andExpect(content().string(""));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "test",                             // non-JSON payload
+            "{ }",                              // empty JSON payload
+            "{ \"author\": \"test\" }",         // missing required fields
+            "{ \"author\": \"testAuthor\"," +   // extra field
+                    "\"title\": \"testTitle\"," +
+                    "\"format\": \"testFormat\"," +
+                    "\"testField\": \"testValue\" }"
+    })
+    void updateEbookByIdWithImproperPayload(String improperPayload) throws Exception {
+
+        // Arrange
+        String id = UUID.randomUUID().toString();
+
+        // Act
+        ResultActions response = this.mockMvc.perform(put("/ebooks/"+id)
+                .content(objectMapper.writeValueAsString(improperPayload))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // Assert
+        verifyNoInteractions(ebookService);
+        response.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(content().string(""));
+        //.andDo(print());
+    }
+
+    @Test
+    void updateEbookByIdWithIdMatchWithProperPayload() throws Exception {
+
+        // Arrange
+        String id = UUID.randomUUID().toString();
+        Map<String, Ebook> oneEbook = new HashMap<>()
+        {{
+            put(id, new Ebook(id, "testAuthor", "testTitle", "testFormat"));
+        }};
+        Ebook updateEbook = new Ebook();
+        updateEbook.setFormat("testFormatNew");
+        updateEbook.setTitle("testTitleNew");
+        updateEbook.setAuthor("testAuthorNew");
+        when(ebookService.get(id)).thenReturn(oneEbook.get(id));
+        // no need to mock void ebookService.update
+
+        // Act
+        ResultActions response = this.mockMvc.perform(put("/ebooks/"+id)
+                .content(objectMapper.writeValueAsString(updateEbook))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // Assert
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                //.andDo(print())
+                .andExpect(header().string("Content-Type", "application/json"))
+                .andExpect(jsonPath("$.author").value("testAuthorNew"))
+                .andExpect(jsonPath("$.title").value("testTitleNew"))
+                .andExpect(jsonPath("$.format").value("testFormatNew"))
+                .andExpect(jsonPath("$.*", hasSize(3)));
+    }
+
+    @Test
+    void deleteEbookByIdWithoutIdMatch() throws Exception {
+
+        // Arrange
+        String id = UUID.randomUUID().toString();
+        when(ebookService.remove(id)).thenReturn(null);
+
+        // Act
+        ResultActions response = this.mockMvc.perform(delete("/ebooks/"+id)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // Assert
+        response.andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andDo(print())
+                .andExpect(content().string(""));
+    }
+
+    @Test
+    void deleteEbookByIdWithIdMatch() throws Exception {
+
+        // Arrange
+        String id = UUID.randomUUID().toString();
+        Ebook removedEbook = new Ebook();
+
+        when(ebookService.remove(id)).thenReturn(removedEbook);
+
+        // Act
+        ResultActions response = this.mockMvc.perform(delete("/ebooks/"+id)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // Assert
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print())
                 .andExpect(content().string(""));
     }
 }
