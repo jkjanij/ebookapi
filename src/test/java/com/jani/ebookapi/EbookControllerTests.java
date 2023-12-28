@@ -1,10 +1,13 @@
 package com.jani.ebookapi;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jani.ebookapi.model.Ebook;
 import com.jani.ebookapi.service.EbookService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,11 +19,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.*;
 
-import static net.bytebuddy.matcher.ElementMatchers.is;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.core.StringRegularExpression.matchesRegex;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -81,8 +83,32 @@ class EbookControllerTests {
                         .andExpect(jsonPath("$.id").isString());
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "test",                             // non-JSON payload
+        "{ }",                              // empty JSON payload
+        "{ \"author\": \"test\" }",         // missing required fields
+        "{ \"author\": \"testAuthor\"," +   // extra field
+          "\"title\": \"testTitle\"," +
+          "\"format\": \"testFormat\"," +
+          "\"testField\": \"testValue\" }"
+    })
+    void addEbookWithImproperPayload(String improperPayload) throws Exception {
+
+        // Arrange
+        // Act
+        ResultActions response = this.mockMvc.perform(post("/ebooks")
+                .content(improperPayload)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // Assert
+        verifyNoInteractions(ebookService);
+        response.andExpect(MockMvcResultMatchers.status().isBadRequest());
+                //.andDo(print());
+    }
+
     @Test
-    void getEbookWithNoStoredEbooks() throws Exception {
+    void getEbooksWithNoStoredEbooks() throws Exception {
 
         // Arrange
         Map<String, Ebook> noEbooks = new HashMap<>();
@@ -100,7 +126,7 @@ class EbookControllerTests {
     }
 
     @Test
-    void getEbookWithStoredEbooks() throws Exception {
+    void getEbooksWithStoredEbook() throws Exception {
 
         // Arrange
         Map<String, Ebook> oneEbook = new HashMap<>()
