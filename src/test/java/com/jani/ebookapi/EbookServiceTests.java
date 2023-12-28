@@ -33,6 +33,7 @@ public class EbookServiceTests {
         // Act
         Ebook retrievedEbook = ebookService.get(addedEbook.getId());
 
+        // Assert
         assertNotNull(retrievedEbook);
         assertEquals(retrievedEbook.getTitle(), addedEbook.getTitle());
         assertEquals(retrievedEbook.getAuthor(), addedEbook.getAuthor());
