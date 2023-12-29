@@ -5,18 +5,18 @@
 ### Windows
 
 #### JAR
-1. .\mvnw clean package
+1. mvnw.cmd clean package
 2. java -jar .\target\ebookapi-1.0.0.jar
 
 #### Spring Boot Maven Plugin
-- .\mvnw spring-boot:run
+- mvnw.cmd spring-boot:run
 
 
 ### Linux
 
 #### JAR
-1. mvn clean package
-2. java -jar .\target\ebookapi-1.0.0.jar
+1. mvnw clean package
+2. java -jar ./target/ebookapi-1.0.0.jar
 
 #### Spring Boot Maven Plugin
-- mvn spring-boot:run
+- mvnw spring-boot:run
