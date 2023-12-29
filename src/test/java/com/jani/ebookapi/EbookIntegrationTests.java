@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -45,26 +46,6 @@ public class EbookIntegrationTests {
     }
 
     @Test
-    void getAllEbooksWithNoStoredEbooks() throws Exception {
-        // Act & Assert
-        this.mockMvc.perform(get("/ebooks")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(header().string("Content-Type", "application/json"))
-                .andExpect(jsonPath( "$.data", Matchers.empty()))
-                .andExpect(jsonPath("$.*", hasSize(1)));
-    }
-
-    @Test
-    void addEbookIncorrectPayload() throws Exception {
-        // Act & Assert
-        this.mockMvc.perform(post("/ebooks")
-                .content("{\"author\":\"testAuthor\", \"title\":\"testTitle\"}") // missing field
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(""));
-    }
-
-    @Test
     void addEbookCorrectPayload() throws Exception {
         // Arrange
         Ebook update = new Ebook();
@@ -83,6 +64,37 @@ public class EbookIntegrationTests {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.id").isString())
                 .andExpect(jsonPath("$.*", hasSize(4)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "test",                             // non-JSON payload
+            "{ }",                              // empty JSON payload
+            "{ \"author\": \"test\" }",         // missing required fields
+            "{ \"author\": \"testAuthor\"," +   // extra field
+                    "\"title\": \"testTitle\"," +
+                    "\"format\": \"testFormat\"," +
+                    "\"testField\": \"testValue\" }"
+    })
+    void addEbookWithIncorrectPayload(String incorrectPayload) throws Exception {
+
+        // Arrange
+        // Act
+        ResultActions response = this.mockMvc.perform(post("/ebooks")
+                .content(incorrectPayload)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(""));
+    }
+
+    @Test
+    void getAllEbooksWithNoStoredEbooks() throws Exception {
+        // Act & Assert
+        this.mockMvc.perform(get("/ebooks")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(header().string("Content-Type", "application/json"))
+                .andExpect(jsonPath( "$.data", Matchers.empty()))
+                .andExpect(jsonPath("$.*", hasSize(1)));
     }
 
     @Test
