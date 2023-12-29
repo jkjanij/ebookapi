@@ -72,7 +72,6 @@ class EbookControllerTests {
 
         // Assert
         response.andExpect(MockMvcResultMatchers.status().isCreated())
-                        //.andDo(MockMvcResultHandlers.print())
                         .andExpect(header().string("Content-Type", "application/json"))
                         .andExpect(jsonPath("$.author").value("testAuthor"))
                         .andExpect(jsonPath("$.title").value("testTitle"))
@@ -104,7 +103,6 @@ class EbookControllerTests {
         verifyNoInteractions(ebookService);
         response.andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(content().string(""));
-                //.andDo(print());
     }
 
     @Test
@@ -120,7 +118,6 @@ class EbookControllerTests {
 
         // Assert
         response.andExpect(MockMvcResultMatchers.status().isOk())
-                //.andDo(print())
                 .andExpect(header().string("Content-Type", "application/json"))
                 .andExpect(jsonPath( "$.data", Matchers.empty()))
                 .andExpect(jsonPath("$.*", hasSize(1)));
@@ -143,11 +140,9 @@ class EbookControllerTests {
 
         // Assert
         response.andExpect(MockMvcResultMatchers.status().isOk())
-                //.andDo(print())
                 .andExpect(header().string("Content-Type", "application/json"))
                 .andExpect(jsonPath("$.data", hasSize(1)))
                 .andExpect(jsonPath("$.data[0].id").exists())
-                //.andExpect(jsonPath("$.data[0].id", isValidUUID())) // need some method to check for valid UUID
                 .andExpect(jsonPath("$.data[0].author").value("testAuthor"))
                 .andExpect(jsonPath("$.data[0].title").value("testTitle"))
                 .andExpect(jsonPath("$.data[0].format").value("testFormat"))
@@ -171,7 +166,6 @@ class EbookControllerTests {
 
         // Assert
         response.andExpect(MockMvcResultMatchers.status().isOk())
-                //.andDo(print())
                 .andExpect(header().string("Content-Type", "application/json"))
                 .andExpect(jsonPath("$.author").value("testAuthor"))
                 .andExpect(jsonPath("$.title").value("testTitle"))
@@ -192,7 +186,6 @@ class EbookControllerTests {
 
         // Assert
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
-                //.andDo(print())
                 .andExpect(content().string(""));
     }
 
@@ -242,7 +235,6 @@ class EbookControllerTests {
         verifyNoInteractions(ebookService);
         response.andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(content().string(""));
-        //.andDo(print());
     }
 
     @Test
@@ -268,7 +260,6 @@ class EbookControllerTests {
 
         // Assert
         response.andExpect(MockMvcResultMatchers.status().isOk())
-                //.andDo(print())
                 .andExpect(header().string("Content-Type", "application/json"))
                 .andExpect(jsonPath("$.author").value("testAuthorNew"))
                 .andExpect(jsonPath("$.title").value("testTitleNew"))
