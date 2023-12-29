@@ -1,6 +1,5 @@
 package com.jani.ebookapi;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jani.ebookapi.model.Ebook;
 import com.jani.ebookapi.service.EbookService;
@@ -41,7 +40,7 @@ class EbookControllerTests {
     private ObjectMapper objectMapper;
 
     @Test
-    void shouldReturnHello() throws Exception {
+    void shouldReturnWelcomeMessage() throws Exception {
 
         this.mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
@@ -49,7 +48,7 @@ class EbookControllerTests {
     }
 
     @Test
-    void addEbookWithProperPayload() throws Exception {
+    void shouldAddEbookWithCorrectPayload() throws Exception {
 
         // Arrange
         Ebook inputEbook = new Ebook();
@@ -89,7 +88,7 @@ class EbookControllerTests {
           "\"format\": \"testFormat\"," +
           "\"testField\": \"testValue\" }"
     })
-    void addEbookWithImproperPayload(String improperPayload) throws Exception {
+    void shouldRejectAddEbookWithIncorrectPayload(String improperPayload) throws Exception {
 
         // Arrange
         // Act
@@ -104,7 +103,7 @@ class EbookControllerTests {
     }
 
     @Test
-    void getAllEbooksWithNoStoredEbooks() throws Exception {
+    void shouldGetAllEbooksWithNoStoredEbooks() throws Exception {
 
         // Arrange
         Map<String, Ebook> noEbooks = new HashMap<>();
@@ -122,7 +121,7 @@ class EbookControllerTests {
     }
 
     @Test
-    void getAllEbooksWithStoredEbook() throws Exception {
+    void shouldGetAllEbooksWithStoredEbook() throws Exception {
 
         // Arrange
         String id = UUID.randomUUID().toString();
@@ -148,7 +147,7 @@ class EbookControllerTests {
     }
 
     @Test
-    void getEbookByIdWithIdMatch() throws Exception {
+    void shouldGetEbookByIdWithMatchingId() throws Exception {
 
         // Arrange
         String id = UUID.randomUUID().toString();
@@ -159,8 +158,7 @@ class EbookControllerTests {
         when(ebookService.get(id)).thenReturn(returnEbook);
 
         // Act
-        ResultActions response = this.mockMvc.perform(get("/ebooks/"+id)
-                .contentType(MediaType.APPLICATION_JSON));
+        ResultActions response = this.mockMvc.perform(get("/ebooks/"+id));
 
         // Assert
         response.andExpect(MockMvcResultMatchers.status().isOk())
@@ -172,15 +170,14 @@ class EbookControllerTests {
     }
 
     @Test
-    void getEbookByIdWithoutIdMatch() throws Exception {
+    void shouldNotGetEbookByIdWithoutMatchingId() throws Exception {
 
         // Arrange
         String id = UUID.randomUUID().toString();
         when(ebookService.get(id)).thenReturn(null);
 
         // Act
-        ResultActions response = this.mockMvc.perform(get("/ebooks/"+id)
-                .contentType(MediaType.APPLICATION_JSON));
+        ResultActions response = this.mockMvc.perform(get("/ebooks/"+id));
 
         // Assert
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
@@ -188,7 +185,7 @@ class EbookControllerTests {
     }
 
     @Test
-    void updateEbookByIdWithoutIdMatchWithProperPayload() throws Exception {
+    void shouldNotUpdateEbookWithoutMatchingId() throws Exception {
 
         // Arrange
         String id = UUID.randomUUID().toString();
@@ -218,7 +215,7 @@ class EbookControllerTests {
                     "\"format\": \"testFormat\"," +
                     "\"testField\": \"testValue\" }"
     })
-    void updateEbookByIdWithImproperPayload(String improperPayload) throws Exception {
+    void shouldRejectUpdateEbookWithIncorrectPayload(String improperPayload) throws Exception {
 
         // Arrange
         String id = UUID.randomUUID().toString();
@@ -235,7 +232,7 @@ class EbookControllerTests {
     }
 
     @Test
-    void updateEbookByIdWithIdMatchWithProperPayload() throws Exception {
+    void shouldUpdateEbookWithMatchingId() throws Exception {
 
         // Arrange
         String id = UUID.randomUUID().toString();
@@ -265,15 +262,14 @@ class EbookControllerTests {
     }
 
     @Test
-    void deleteEbookByIdWithoutIdMatch() throws Exception {
+    void shouldNotDeleteEbookByIdWithoutMatchingId() throws Exception {
 
         // Arrange
         String id = UUID.randomUUID().toString();
         when(ebookService.remove(id)).thenReturn(null);
 
         // Act
-        ResultActions response = this.mockMvc.perform(delete("/ebooks/"+id)
-                .contentType(MediaType.APPLICATION_JSON));
+        ResultActions response = this.mockMvc.perform(delete("/ebooks/"+id));
 
         // Assert
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
@@ -281,7 +277,7 @@ class EbookControllerTests {
     }
 
     @Test
-    void deleteEbookByIdWithIdMatch() throws Exception {
+    void shouldDeleteEbookByIdWithMatchingId() throws Exception {
 
         // Arrange
         String id = UUID.randomUUID().toString();
@@ -290,8 +286,7 @@ class EbookControllerTests {
         when(ebookService.remove(id)).thenReturn(removedEbook);
 
         // Act
-        ResultActions response = this.mockMvc.perform(delete("/ebooks/"+id)
-                .contentType(MediaType.APPLICATION_JSON));
+        ResultActions response = this.mockMvc.perform(delete("/ebooks/"+id));
 
         // Assert
         response.andExpect(MockMvcResultMatchers.status().isOk())

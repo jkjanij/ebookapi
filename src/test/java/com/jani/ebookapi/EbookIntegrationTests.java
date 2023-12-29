@@ -13,14 +13,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -46,7 +44,7 @@ public class EbookIntegrationTests {
     }
 
     @Test
-    void addEbookCorrectPayload() throws Exception {
+    void shouldAddEbookWithCorrectPayload() throws Exception {
         // Arrange
         Ebook update = new Ebook();
         update.setFormat("testFormat");
@@ -76,11 +74,11 @@ public class EbookIntegrationTests {
                     "\"format\": \"testFormat\"," +
                     "\"testField\": \"testValue\" }"
     })
-    void addEbookWithIncorrectPayload(String incorrectPayload) throws Exception {
+    void shouldNotAddEbookWithIncorrectPayload(String incorrectPayload) throws Exception {
 
         // Arrange
         // Act
-        ResultActions response = this.mockMvc.perform(post("/ebooks")
+        this.mockMvc.perform(post("/ebooks")
                 .content(incorrectPayload)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -88,17 +86,17 @@ public class EbookIntegrationTests {
     }
 
     @Test
-    void getAllEbooksWithNoStoredEbooks() throws Exception {
+    void shouldGetAllEbooksWithNoStoredEbooks() throws Exception {
         // Act & Assert
         this.mockMvc.perform(get("/ebooks")
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(header().string("Content-Type", "application/json"))
                 .andExpect(jsonPath( "$.data", Matchers.empty()))
                 .andExpect(jsonPath("$.*", hasSize(1)));
     }
 
     @Test
-    void getAllEbooksWithStoredEbooks() throws Exception {
+    void shouldGetAllEbooksWithStoredEbooks() throws Exception {
         // Arrange
         ebookService.add(new Ebook(null, "testAuthor1", "testTitle1", "testFormat1"));
         ebookService.add(new Ebook(null, "testAuthor2", "testTitle2", "testFormat2"));
@@ -125,7 +123,7 @@ public class EbookIntegrationTests {
     }
 
     @Test
-    void getEbookByIdWithIdMatch() throws Exception {
+    void shouldGetEbookWithMatchingId() throws Exception {
         // Arrange
         Ebook ebook = ebookService.add(new Ebook(null, "testAuthor", "testTitle", "testFormat"));
 
@@ -140,7 +138,7 @@ public class EbookIntegrationTests {
     }
 
     @Test
-    void getEbookByIdWithoutIdMatch() throws Exception {
+    void shouldNotGetEbookWithoutMatchingId() throws Exception {
         // Arrange
         String id = UUID.randomUUID().toString();
 
@@ -151,7 +149,7 @@ public class EbookIntegrationTests {
     }
 
     @Test
-    void updateEbookByIdWithoutIdMatchWithProperPayload() throws Exception {
+    void shouldNotUpdateEbookWithoutMatchingId() throws Exception {
         // Arrange
         String id = UUID.randomUUID().toString();
         Ebook update = new Ebook();
@@ -177,7 +175,7 @@ public class EbookIntegrationTests {
                     "\"format\": \"testFormat\"," +
                     "\"testField\": \"testValue\" }"
     })
-    void updateEbookByIdWithImproperPayload(String improperPayload) throws Exception {
+    void shouldNotUpdateEbookWithIncorrectPayload(String improperPayload) throws Exception {
         // Arrange
         String id = UUID.randomUUID().toString();
 
@@ -190,7 +188,7 @@ public class EbookIntegrationTests {
     }
 
     @Test
-    void updateEbookByIdWithIdMatchWithProperPayload() throws Exception {
+    void shouldUpdateEbookWithMatchingId() throws Exception {
         // Arrange
         Ebook ebook = ebookService.add(new Ebook(null, "testAuthor", "testTitle", "testFormat"));
         Ebook updateEbook = new Ebook();
@@ -211,19 +209,19 @@ public class EbookIntegrationTests {
     }
 
     @Test
-    void deleteEbookByIdWithoutIdMatch() throws Exception {
+    void shouldNotDeleteEbookWithoutMatchingId() throws Exception {
         // Arrange
         String id = UUID.randomUUID().toString();
 
         // Act & Assert
-        ResultActions response = this.mockMvc.perform(delete("/ebooks/"+id)
+        this.mockMvc.perform(delete("/ebooks/"+id)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(""));
     }
 
     @Test
-    void deleteEbookByIdWithIdMatch() throws Exception {
+    void shouldDeleteEbookWithMatchingId() throws Exception {
         // Arrange
         Ebook ebook = ebookService.add(new Ebook(null, "testAuthor", "testTitle", "testFormat"));
 
