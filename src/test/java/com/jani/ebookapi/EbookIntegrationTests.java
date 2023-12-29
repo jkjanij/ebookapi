@@ -46,7 +46,7 @@ public class EbookIntegrationTests {
     }
 
     @Test
-    void addEbookCorrectPayload() throws Exception {
+    void shouldAddEbookWithCorrectPayload() throws Exception {
         // Arrange
         Ebook update = new Ebook();
         update.setFormat("testFormat");
@@ -76,7 +76,7 @@ public class EbookIntegrationTests {
                     "\"format\": \"testFormat\"," +
                     "\"testField\": \"testValue\" }"
     })
-    void addEbookWithIncorrectPayload(String incorrectPayload) throws Exception {
+    void shouldNotAddEbookWithIncorrectPayload(String incorrectPayload) throws Exception {
 
         // Arrange
         // Act
@@ -88,17 +88,17 @@ public class EbookIntegrationTests {
     }
 
     @Test
-    void getAllEbooksWithNoStoredEbooks() throws Exception {
+    void shouldGetAllEbooksWithNoStoredEbooks() throws Exception {
         // Act & Assert
         this.mockMvc.perform(get("/ebooks")
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(header().string("Content-Type", "application/json"))
                 .andExpect(jsonPath( "$.data", Matchers.empty()))
                 .andExpect(jsonPath("$.*", hasSize(1)));
     }
 
     @Test
-    void getAllEbooksWithStoredEbooks() throws Exception {
+    void shouldGetAllEbooksWithStoredEbooks() throws Exception {
         // Arrange
         ebookService.add(new Ebook(null, "testAuthor1", "testTitle1", "testFormat1"));
         ebookService.add(new Ebook(null, "testAuthor2", "testTitle2", "testFormat2"));
@@ -125,7 +125,7 @@ public class EbookIntegrationTests {
     }
 
     @Test
-    void getEbookByIdWithIdMatch() throws Exception {
+    void shouldGetEbookWithMatchingId() throws Exception {
         // Arrange
         Ebook ebook = ebookService.add(new Ebook(null, "testAuthor", "testTitle", "testFormat"));
 
@@ -140,7 +140,7 @@ public class EbookIntegrationTests {
     }
 
     @Test
-    void getEbookByIdWithoutIdMatch() throws Exception {
+    void shouldNotGetEbookWithoutMatchingId() throws Exception {
         // Arrange
         String id = UUID.randomUUID().toString();
 
@@ -151,7 +151,7 @@ public class EbookIntegrationTests {
     }
 
     @Test
-    void updateEbookByIdWithoutIdMatchWithProperPayload() throws Exception {
+    void shouldNotUpdateEbookWithoutMatchingId() throws Exception {
         // Arrange
         String id = UUID.randomUUID().toString();
         Ebook update = new Ebook();
@@ -177,7 +177,7 @@ public class EbookIntegrationTests {
                     "\"format\": \"testFormat\"," +
                     "\"testField\": \"testValue\" }"
     })
-    void updateEbookByIdWithImproperPayload(String improperPayload) throws Exception {
+    void shouldNotUpdateEbookWithIncorrectPayload(String improperPayload) throws Exception {
         // Arrange
         String id = UUID.randomUUID().toString();
 
@@ -190,7 +190,7 @@ public class EbookIntegrationTests {
     }
 
     @Test
-    void updateEbookByIdWithIdMatchWithProperPayload() throws Exception {
+    void shouldUpdateEbookWithMatchingId() throws Exception {
         // Arrange
         Ebook ebook = ebookService.add(new Ebook(null, "testAuthor", "testTitle", "testFormat"));
         Ebook updateEbook = new Ebook();
@@ -211,7 +211,7 @@ public class EbookIntegrationTests {
     }
 
     @Test
-    void deleteEbookByIdWithoutIdMatch() throws Exception {
+    void shouldNotDeleteEbookWithoutMatchingId() throws Exception {
         // Arrange
         String id = UUID.randomUUID().toString();
 
@@ -223,7 +223,7 @@ public class EbookIntegrationTests {
     }
 
     @Test
-    void deleteEbookByIdWithIdMatch() throws Exception {
+    void shouldDeleteEbookWithMatchingId() throws Exception {
         // Arrange
         Ebook ebook = ebookService.add(new Ebook(null, "testAuthor", "testTitle", "testFormat"));
 

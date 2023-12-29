@@ -22,7 +22,7 @@ public class EbookServiceTests {
     }
 
     @Test
-    void getEbook() {
+    void shouldGetEbookAfterAdding() {
         // Arrange
         Ebook ebook = new Ebook();
         ebook.setAuthor("testAuthor");
@@ -41,7 +41,7 @@ public class EbookServiceTests {
     }
 
     @Test
-    void addEbook() {
+    void shouldAddEbookAndGenerateUUID() {
         // Arrange
         Ebook ebook = new Ebook();
         ebook.setAuthor("testAuthor");
@@ -60,7 +60,7 @@ public class EbookServiceTests {
     }
 
     @Test
-    void updateEbook() {
+    void shouldUpdateEbook() {
         // Arrange
         Ebook originalEbook = new Ebook();
         originalEbook.setAuthor("testAuthor");
@@ -84,7 +84,7 @@ public class EbookServiceTests {
     }
 
     @Test
-    void removeEbook() {
+    void shouldRemoveEbook() {
         // Arrange
         Ebook ebook = new Ebook();
         ebook.setAuthor("testAuthor");
@@ -102,7 +102,7 @@ public class EbookServiceTests {
     }
 
     @Test
-    void getAllEbooks() {
+    void shouldGetAllEbooks() {
         // Arrange
         Ebook ebook1 = new Ebook();
         ebook1.setAuthor("testAuthor1");
@@ -125,7 +125,7 @@ public class EbookServiceTests {
     }
 
     @Test
-    void clearData() {
+    void shouldClearAllEbooksData() {
         // Arrange
         Ebook ebook1 = new Ebook();
         ebook1.setAuthor("testAuthor1");
