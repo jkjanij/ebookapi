@@ -1,6 +1,5 @@
 package com.jani.ebookapi;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jani.ebookapi.model.Ebook;
 import com.jani.ebookapi.service.EbookService;

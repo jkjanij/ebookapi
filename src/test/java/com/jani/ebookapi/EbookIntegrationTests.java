@@ -13,14 +13,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -80,7 +78,7 @@ public class EbookIntegrationTests {
 
         // Arrange
         // Act
-        ResultActions response = this.mockMvc.perform(post("/ebooks")
+        this.mockMvc.perform(post("/ebooks")
                 .content(incorrectPayload)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -216,7 +214,7 @@ public class EbookIntegrationTests {
         String id = UUID.randomUUID().toString();
 
         // Act & Assert
-        ResultActions response = this.mockMvc.perform(delete("/ebooks/"+id)
+        this.mockMvc.perform(delete("/ebooks/"+id)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(""));
