@@ -24,7 +24,6 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -45,7 +44,6 @@ class EbookControllerTests {
     void shouldReturnHello() throws Exception {
 
         this.mockMvc.perform(get("/"))
-                //.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Welcome!")));
     }
@@ -207,7 +205,6 @@ class EbookControllerTests {
 
         // Assert
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andDo(print())
                 .andExpect(content().string(""));
     }
 
@@ -280,7 +277,6 @@ class EbookControllerTests {
 
         // Assert
         response.andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andDo(print())
                 .andExpect(content().string(""));
     }
 
@@ -299,7 +295,6 @@ class EbookControllerTests {
 
         // Assert
         response.andExpect(MockMvcResultMatchers.status().isOk())
-                .andDo(print())
                 .andExpect(content().string(""));
     }
 }
