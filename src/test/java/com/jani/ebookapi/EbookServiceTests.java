@@ -42,16 +42,21 @@ public class EbookServiceTests {
 
     @Test
     void addEbook() {
+        // Arrange
         Ebook ebook = new Ebook();
         ebook.setAuthor("testAuthor");
         ebook.setTitle("testTitle");
         ebook.setFormat("testFormat");
+
+        // Act
         Ebook addedEbook = ebookService.add(ebook);
 
+        // Assert
         assertNotNull(addedEbook.getId());
         assertEquals(ebook.getTitle(), addedEbook.getTitle());
         assertEquals(ebook.getAuthor(), addedEbook.getAuthor());
         assertEquals(ebook.getFormat(), addedEbook.getFormat());
+        assertTrue(isValidUuid(addedEbook.getId()));
     }
 
     @Test
@@ -117,5 +122,14 @@ public class EbookServiceTests {
         assertEquals(2, ebookService.getAll().size());
         assertTrue(allEbooks.contains(ebook1));
         assertTrue(allEbooks.contains(ebook2));
+    }
+
+    private boolean isValidUuid(String uuidString) {
+        try {
+            UUID uuid = UUID.fromString(uuidString);
+            return uuid.version() == 4;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 }
