@@ -34,6 +34,10 @@ public class EbookService {
         return ebook;
     }
 
+    public void clearData() {
+        booksData.clear();
+    }
+
     public void update(String ebookId, Ebook existingEbook, Ebook updatedEbook) {
         booksData.replace(ebookId, existingEbook, updatedEbook);
     }

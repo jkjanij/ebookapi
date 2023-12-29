@@ -124,6 +124,22 @@ public class EbookServiceTests {
         assertTrue(allEbooks.contains(ebook2));
     }
 
+    @Test
+    void clearData() {
+        // Arrange
+        Ebook ebook1 = new Ebook();
+        ebook1.setAuthor("testAuthor1");
+        ebook1.setTitle("testTitle1");
+        ebook1.setFormat("testFormat1");
+        ebookService.add(ebook1);
+
+        // Act
+        ebookService.clearData();
+
+        // Assert
+        assertEquals(0, ebookService.getAll().size());
+    }
+
     private boolean isValidUuid(String uuidString) {
         try {
             UUID uuid = UUID.fromString(uuidString);
