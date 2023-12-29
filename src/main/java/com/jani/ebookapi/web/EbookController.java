@@ -32,7 +32,7 @@ public class EbookController {
     }
 
     @GetMapping("/ebooks/{ebook_id}")
-    public Ebook getEbook(@PathVariable String ebook_id) {
+    public ResponseEntity<Ebook> getEbook(@PathVariable String ebook_id) {
         Ebook ebook = ebookService.get(ebook_id);
         if (ebook == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         // create new Ebook with null id to discard id
@@ -40,7 +40,7 @@ public class EbookController {
         returnEbook.setFormat(ebook.getFormat());
         returnEbook.setTitle(ebook.getTitle());
         returnEbook.setAuthor(ebook.getAuthor());
-        return returnEbook;
+        return new ResponseEntity<>(returnEbook, HttpStatus.OK);
     }
 
     @PostMapping("/ebooks")
@@ -49,7 +49,7 @@ public class EbookController {
     }
 
     @PutMapping("/ebooks/{ebook_id}")
-    public Ebook updateEbook(@RequestBody @Valid Ebook updatedEbook, @PathVariable String ebook_id) {
+    public ResponseEntity<Ebook> updateEbook(@RequestBody @Valid Ebook updatedEbook, @PathVariable String ebook_id) {
         Ebook existingEbook = ebookService.get(ebook_id);
         if (existingEbook == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         updatedEbook.setId(ebook_id);
@@ -59,7 +59,7 @@ public class EbookController {
         returnEbook.setFormat(updatedEbook.getFormat());
         returnEbook.setTitle(updatedEbook.getTitle());
         returnEbook.setAuthor(updatedEbook.getAuthor());
-        return returnEbook;
+        return new ResponseEntity<>(returnEbook, HttpStatus.OK);
     }
 
     @DeleteMapping("/ebooks/{ebook_id}")
