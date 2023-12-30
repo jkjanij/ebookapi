@@ -49,16 +49,16 @@ public class EbookController {
     }
 
     @PutMapping("/ebooks/{ebook_id}")
-    public ResponseEntity<Ebook> updateEbook(@RequestBody @Valid Ebook updatedEbook, @PathVariable String ebook_id) {
+    public ResponseEntity<Ebook> updateEbook(@RequestBody @Valid Ebook updateForEbook, @PathVariable String ebook_id) {
         Ebook existingEbook = ebookService.get(ebook_id);
         if (existingEbook == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        updatedEbook.setId(ebook_id);
-        ebookService.update(ebook_id, existingEbook, updatedEbook);
+        updateForEbook.setId(ebook_id);
+        ebookService.update(ebook_id, existingEbook, updateForEbook);
         // create new Ebook with null id to discard id
         Ebook returnEbook = new Ebook();
-        returnEbook.setFormat(updatedEbook.getFormat());
-        returnEbook.setTitle(updatedEbook.getTitle());
-        returnEbook.setAuthor(updatedEbook.getAuthor());
+        returnEbook.setFormat(updateForEbook.getFormat());
+        returnEbook.setTitle(updateForEbook.getTitle());
+        returnEbook.setAuthor(updateForEbook.getAuthor());
         return new ResponseEntity<>(returnEbook, HttpStatus.OK);
     }
 
