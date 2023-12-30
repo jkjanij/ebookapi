@@ -24,12 +24,6 @@ public class EbookService {
 
     public Ebook add(Ebook ebook) {
         ebook.setId(UUID.randomUUID().toString());
-        // check that random UUID is unique (_extremely_ unlikely to not be)
-        while (true) {
-            if (booksData.get(ebook.getId()) != null) {
-                ebook.setId(UUID.randomUUID().toString());
-            } else { break; }
-        }
         booksData.put(ebook.getId(), ebook);
         return ebook;
     }
