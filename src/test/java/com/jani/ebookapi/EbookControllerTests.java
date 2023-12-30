@@ -83,7 +83,10 @@ class EbookControllerTests {
         "{ \"author\": \"testAuthor\"," +   // extra field
           "\"title\": \"testTitle\"," +
           "\"format\": \"testFormat\"," +
-          "\"testField\": \"testValue\" }"
+          "\"testField\": \"testValue\" }",
+        "{ \"author\": \"\"," +             // empty required field values
+          "\"title\": \"\"," +
+          "\"format\": \"\" }",
     })
     void shouldRejectAddEbookWithIncorrectPayload(String improperPayload) throws Exception {
 
@@ -195,9 +198,12 @@ class EbookControllerTests {
             "{ }",                              // empty JSON payload
             "{ \"author\": \"test\" }",         // missing required fields
             "{ \"author\": \"testAuthor\"," +   // extra field
-                    "\"title\": \"testTitle\"," +
-                    "\"format\": \"testFormat\"," +
-                    "\"testField\": \"testValue\" }"
+              "\"title\": \"testTitle\"," +
+              "\"format\": \"testFormat\"," +
+              "\"testField\": \"testValue\" }",
+            "{ \"author\": \"\"," +             // empty required field values
+              "\"title\": \"\"," +
+              "\"format\": \"\" }",
     })
     void shouldRejectUpdateEbookWithIncorrectPayload(String improperPayload) throws Exception {
 
