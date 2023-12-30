@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
-@SpringBootTest
+@SpringBootTest(classes = EbookApplication.class)
 @AutoConfigureMockMvc
 public class EbookIntegrationTests {
 
@@ -70,9 +70,12 @@ public class EbookIntegrationTests {
             "{ }",                              // empty JSON payload
             "{ \"author\": \"test\" }",         // missing required fields
             "{ \"author\": \"testAuthor\"," +   // extra field
-                    "\"title\": \"testTitle\"," +
-                    "\"format\": \"testFormat\"," +
-                    "\"testField\": \"testValue\" }"
+              "\"title\": \"testTitle\"," +
+              "\"format\": \"testFormat\"," +
+              "\"testField\": \"testValue\" }",
+            "{ \"author\": \"\"," +             // empty required field values
+              "\"title\": \"\"," +
+              "\"format\": \"\" }",
     })
     void shouldNotAddEbookWithIncorrectPayload(String incorrectPayload) throws Exception {
 
@@ -171,9 +174,12 @@ public class EbookIntegrationTests {
             "{ }",                              // empty JSON payload
             "{ \"author\": \"test\" }",         // missing required fields
             "{ \"author\": \"testAuthor\"," +   // extra field
-                    "\"title\": \"testTitle\"," +
-                    "\"format\": \"testFormat\"," +
-                    "\"testField\": \"testValue\" }"
+              "\"title\": \"testTitle\"," +
+              "\"format\": \"testFormat\"," +
+              "\"testField\": \"testValue\" }",
+            "{ \"author\": \"\"," +             // empty required field values
+              "\"title\": \"\"," +
+              "\"format\": \"\" }",
     })
     void shouldNotUpdateEbookWithIncorrectPayload(String improperPayload) throws Exception {
         // Arrange
