@@ -13,7 +13,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.*;
@@ -62,20 +61,18 @@ class EbookControllerTests {
             return outputEbook;
         });
 
-        // Act
-        ResultActions response = this.mockMvc.perform(post("/ebooks")
-                        .content(objectMapper.writeValueAsString(inputEbook))
-                        .contentType(MediaType.APPLICATION_JSON));
-
-        // Assert
-        response.andExpect(MockMvcResultMatchers.status().isCreated())
-                        .andExpect(header().string("Content-Type", "application/json"))
-                        .andExpect(jsonPath("$.author").value("testAuthor"))
-                        .andExpect(jsonPath("$.title").value("testTitle"))
-                        .andExpect(jsonPath("$.format").value("testFormat"))
-                        .andExpect(jsonPath("$.id").exists())
-                        .andExpect(jsonPath("$.id").isString())
-                        .andExpect(jsonPath("$.*", hasSize(4)));
+        // Act & Assert
+        this.mockMvc.perform(post("/ebooks")
+                .content(objectMapper.writeValueAsString(inputEbook))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Content-Type", "application/json"))
+                .andExpect(jsonPath("$.author").value("testAuthor"))
+                .andExpect(jsonPath("$.title").value("testTitle"))
+                .andExpect(jsonPath("$.format").value("testFormat"))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.id").isString())
+                .andExpect(jsonPath("$.*", hasSize(4)));
     }
 
     @ParameterizedTest
@@ -90,16 +87,13 @@ class EbookControllerTests {
     })
     void shouldRejectAddEbookWithIncorrectPayload(String improperPayload) throws Exception {
 
-        // Arrange
-        // Act
-        ResultActions response = this.mockMvc.perform(post("/ebooks")
+        // Act & Assert
+        this.mockMvc.perform(post("/ebooks")
                 .content(improperPayload)
-                .contentType(MediaType.APPLICATION_JSON));
-
-        // Assert
-        verifyNoInteractions(ebookService);
-        response.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
                 .andExpect(content().string(""));
+        verifyNoInteractions(ebookService);
     }
 
     @Test
@@ -109,12 +103,10 @@ class EbookControllerTests {
         Map<String, Ebook> noEbooks = new HashMap<>();
         when(ebookService.getAll()).thenReturn(noEbooks.values());
 
-        // Act
-        ResultActions response = this.mockMvc.perform(get("/ebooks")
-                        .contentType(MediaType.APPLICATION_JSON));
-
-        // Assert
-        response.andExpect(MockMvcResultMatchers.status().isOk())
+        // Act & Assert
+        this.mockMvc.perform(get("/ebooks")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", "application/json"))
                 .andExpect(jsonPath( "$.data", Matchers.empty()))
                 .andExpect(jsonPath("$.*", hasSize(1)));
@@ -131,12 +123,10 @@ class EbookControllerTests {
                 }};
         when(ebookService.getAll()).thenReturn(oneEbook.values());
 
-        // Act
-        ResultActions response = this.mockMvc.perform(get("/ebooks")
-                .contentType(MediaType.APPLICATION_JSON));
-
-        // Assert
-        response.andExpect(MockMvcResultMatchers.status().isOk())
+        // Act & Assert
+        this.mockMvc.perform(get("/ebooks")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", "application/json"))
                 .andExpect(jsonPath("$.data", hasSize(1)))
                 .andExpect(jsonPath("$.data[0].id").exists())
@@ -157,11 +147,9 @@ class EbookControllerTests {
         returnEbook.setAuthor("testAuthor");
         when(ebookService.get(id)).thenReturn(returnEbook);
 
-        // Act
-        ResultActions response = this.mockMvc.perform(get("/ebooks/"+id));
-
-        // Assert
-        response.andExpect(MockMvcResultMatchers.status().isOk())
+        // Act & Assert
+        this.mockMvc.perform(get("/ebooks/"+id))
+                .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", "application/json"))
                 .andExpect(jsonPath("$.author").value("testAuthor"))
                 .andExpect(jsonPath("$.title").value("testTitle"))
@@ -176,11 +164,9 @@ class EbookControllerTests {
         String id = UUID.randomUUID().toString();
         when(ebookService.get(id)).thenReturn(null);
 
-        // Act
-        ResultActions response = this.mockMvc.perform(get("/ebooks/"+id));
-
-        // Assert
-        response.andExpect(MockMvcResultMatchers.status().isNotFound())
+        // Act & Assert
+        this.mockMvc.perform(get("/ebooks/"+id))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(content().string(""));
     }
 
@@ -195,13 +181,11 @@ class EbookControllerTests {
         update.setAuthor("testAuthor");
         when(ebookService.get(id)).thenReturn(null);
 
-        // Act
-        ResultActions response = this.mockMvc.perform(put("/ebooks/"+id)
+        // Act & Assert
+        this.mockMvc.perform(put("/ebooks/"+id)
                 .content(objectMapper.writeValueAsString(update))
-                .contentType(MediaType.APPLICATION_JSON));
-
-        // Assert
-        response.andExpect(MockMvcResultMatchers.status().isNotFound())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
                 .andExpect(content().string(""));
     }
 
@@ -220,15 +204,12 @@ class EbookControllerTests {
         // Arrange
         String id = UUID.randomUUID().toString();
 
-        // Act
-        ResultActions response = this.mockMvc.perform(put("/ebooks/"+id)
+        // Act & Assert
+        this.mockMvc.perform(put("/ebooks/"+id)
                 .content(objectMapper.writeValueAsString(improperPayload))
-                .contentType(MediaType.APPLICATION_JSON));
-
-        // Assert
-        verifyNoInteractions(ebookService);
-        response.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
                 .andExpect(content().string(""));
+        verifyNoInteractions(ebookService);
     }
 
     @Test
@@ -247,13 +228,10 @@ class EbookControllerTests {
         when(ebookService.get(id)).thenReturn(oneEbook.get(id));
         // no need to mock void ebookService.update
 
-        // Act
-        ResultActions response = this.mockMvc.perform(put("/ebooks/"+id)
+        // Act & Assert
+        this.mockMvc.perform(put("/ebooks/"+id)
                 .content(objectMapper.writeValueAsString(updateEbook))
-                .contentType(MediaType.APPLICATION_JSON));
-
-        // Assert
-        response.andExpect(MockMvcResultMatchers.status().isOk())
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", "application/json"))
                 .andExpect(jsonPath("$.author").value("testAuthorNew"))
                 .andExpect(jsonPath("$.title").value("testTitleNew"))
@@ -268,11 +246,9 @@ class EbookControllerTests {
         String id = UUID.randomUUID().toString();
         when(ebookService.remove(id)).thenReturn(null);
 
-        // Act
-        ResultActions response = this.mockMvc.perform(delete("/ebooks/"+id));
-
-        // Assert
-        response.andExpect(MockMvcResultMatchers.status().isNotFound())
+        // Act & Assert
+        this.mockMvc.perform(delete("/ebooks/"+id))
+                .andExpect(status().isNotFound())
                 .andExpect(content().string(""));
     }
 
@@ -285,11 +261,9 @@ class EbookControllerTests {
 
         when(ebookService.remove(id)).thenReturn(removedEbook);
 
-        // Act
-        ResultActions response = this.mockMvc.perform(delete("/ebooks/"+id));
-
-        // Assert
-        response.andExpect(MockMvcResultMatchers.status().isOk())
+        // Act & Assert
+        this.mockMvc.perform(delete("/ebooks/"+id))
+                .andExpect(status().isOk())
                 .andExpect(content().string(""));
     }
 }
