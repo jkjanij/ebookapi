@@ -55,11 +55,13 @@ class EbookControllerTests {
         inputEbook.setTitle("testTitle");
         inputEbook.setFormat("testFormat");
 
-        when(ebookService.add(any(Ebook.class))).thenAnswer(invocation -> {
-            Ebook outputEbook = invocation.getArgument(0);
-            outputEbook.setId(UUID.randomUUID().toString()); // Mocking the generated ID
-            return outputEbook;
-        });
+        Ebook outputEbook = new Ebook();
+        outputEbook.setId(UUID.randomUUID().toString());
+        outputEbook.setAuthor("testAuthor");
+        outputEbook.setTitle("testTitle");
+        outputEbook.setFormat("testFormat");
+
+        when(ebookService.add(any(Ebook.class))).thenReturn(outputEbook);
 
         // Act & Assert
         this.mockMvc.perform(post("/ebooks")
@@ -103,8 +105,7 @@ class EbookControllerTests {
     void shouldGetAllEbooksWithNoStoredEbooks() throws Exception {
 
         // Arrange
-        Map<String, Ebook> noEbooks = new HashMap<>();
-        when(ebookService.getAll()).thenReturn(noEbooks.values());
+        when(ebookService.getAll()).thenReturn(Collections.emptyList());
 
         // Act & Assert
         this.mockMvc.perform(get("/ebooks")
@@ -120,11 +121,8 @@ class EbookControllerTests {
 
         // Arrange
         String id = UUID.randomUUID().toString();
-        Map<String, Ebook> oneEbook = new HashMap<>()
-                {{
-                    put(id, new Ebook(id, "testAuthor", "testTitle", "testFormat"));
-                }};
-        when(ebookService.getAll()).thenReturn(oneEbook.values());
+        Ebook ebook = new Ebook(id, "testAuthor", "testTitle", "testFormat");
+        when(ebookService.getAll()).thenReturn(Arrays.asList(ebook));
 
         // Act & Assert
         this.mockMvc.perform(get("/ebooks")
@@ -223,20 +221,23 @@ class EbookControllerTests {
 
         // Arrange
         String id = UUID.randomUUID().toString();
-        Map<String, Ebook> oneEbook = new HashMap<>()
-        {{
-            put(id, new Ebook(id, "testAuthor", "testTitle", "testFormat"));
-        }};
-        Ebook updateEbook = new Ebook();
-        updateEbook.setFormat("testFormatNew");
-        updateEbook.setTitle("testTitleNew");
-        updateEbook.setAuthor("testAuthorNew");
-        when(ebookService.get(id)).thenReturn(oneEbook.get(id));
+        Ebook existingEbook = new Ebook();
+        existingEbook.setId(id);
+        existingEbook.setFormat("testFormat");
+        existingEbook.setTitle("testTitle");
+        existingEbook.setAuthor("testAuthor");
+
+        Ebook updateForEbook = new Ebook();
+        updateForEbook.setFormat("testFormatNew");
+        updateForEbook.setTitle("testTitleNew");
+        updateForEbook.setAuthor("testAuthorNew");
+
+        when(ebookService.get(id)).thenReturn(existingEbook);
         // no need to mock void ebookService.update
 
         // Act & Assert
         this.mockMvc.perform(put("/ebooks/"+id)
-                .content(objectMapper.writeValueAsString(updateEbook))
+                .content(objectMapper.writeValueAsString(updateForEbook))
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", "application/json"))
                 .andExpect(jsonPath("$.author").value("testAuthorNew"))
